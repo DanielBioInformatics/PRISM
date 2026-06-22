@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="{{ html_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRISM&trade; Protein Intelligence Suite</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #060913;
+            color: #f1f5f9;
+            line-height: 1.6;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 16px 24px; border-bottom: 1px solid #222f54;
+        }
+        .nav-logo {
+            font-size: 20px; font-weight: 800;
+            background: linear-gradient(to right, #06b6d4, #6366f1);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .nav-links { display: flex; align-items: center; gap: 8px; }
+        .nav-links a {
+            color: #94a3b8; text-decoration: none; font-size: 13px; font-weight: 600;
+            padding: 6px 12px; border-radius: 8px; transition: all 0.15s;
+        }
+        .nav-links a:hover { color: #f1f5f9; background: #1e293b60; }
+        .nav-links a.lang-link { font-size: 12px; padding: 3px 8px; }
+        .nav-links a.lang-link.active { color: #06b6d4; background: #06b6d420; }
+        .nav-cta {
+            padding: 8px 20px; border-radius: 10px;
+            background: linear-gradient(135deg, #6366f1, #06b6d4); color: white !important;
+            font-weight: 700;
+        }
+
+        /* HERO */
+        .hero {
+            text-align: center; padding: 100px 24px 80px;
+        }
+        .hero h1 {
+            font-size: 52px; font-weight: 800; line-height: 1.15; margin-bottom: 20px;
+            background: linear-gradient(to right, #06b6d4, #6366f1, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 18px; color: #64748b; max-width: 700px; margin: 0 auto 36px;
+        }
+        .hero-badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 32px; }
+        .hero-badge {
+            padding: 6px 16px; border-radius: 20px; font-size: 12px; font-weight: 600;
+            border: 1px solid #222f54; background: #0f1424; color: #94a3b8;
+        }
+        .hero-badge.accent { border-color: #06b6d450; color: #06b6d4; }
+        .hero-cta { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .hero-cta a {
+            padding: 14px 32px; border-radius: 12px; font-size: 15px; font-weight: 700;
+            text-decoration: none; transition: opacity 0.15s;
+        }
+        .hero-cta a:hover { opacity: 0.9; }
+        .hero-cta .primary {
+            background: linear-gradient(135deg, #6366f1, #06b6d4); color: white;
+            box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+        }
+        .hero-cta .secondary {
+            background: #0f1424; color: #f1f5f9; border: 1px solid #222f54;
+        }
+
+        /* SECTIONS */
+        section { padding: 80px 0; }
+        .section-title {
+            font-size: 30px; font-weight: 700; text-align: center; margin-bottom: 14px;
+        }
+        .section-sub {
+            font-size: 15px; color: #64748b; text-align: center; max-width: 600px;
+            margin: 0 auto 50px;
+        }
+
+        /* FEATURES GRID */
+        .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+        @media (max-width: 900px) { .features-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { .features-grid { grid-template-columns: 1fr; } }
+        .feature-card {
+            background: #0f1424; border: 1px solid #222f54; border-radius: 16px;
+            padding: 28px; transition: border-color 0.2s, transform 0.2s;
+        }
+        .feature-card:hover { border-color: #6366f1; transform: translateY(-2px); }
+        .feature-icon { font-size: 32px; margin-bottom: 16px; }
+        .feature-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .feature-card p { font-size: 13px; color: #94a3b8; line-height: 1.6; }
+
+        /* HOW IT WORKS */
+        .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+        @media (max-width: 700px) { .steps { grid-template-columns: 1fr; } }
+        .step { text-align: center; }
+        .step-num {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #06b6d4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; font-weight: 800; margin: 0 auto 16px;
+        }
+        .step h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+        .step p { font-size: 13px; color: #64748b; }
+
+        /* TECH STACK */
+        .tech-grid { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .tech-badge {
+            padding: 10px 20px; border-radius: 10px;
+            background: #0f1424; border: 1px solid #222f54;
+            font-size: 13px; font-weight: 600; color: #94a3b8;
+        }
+
+        /* FOOTER */
+        footer {
+            border-top: 1px solid #222f54; padding: 40px 24px;
+            text-align: center; color: #475569; font-size: 13px;
+        }
+
+        hr { border: none; border-top: 1px solid #222f54; margin: 0; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-logo">PRISM&trade;</div>
+        <div class="nav-links">
+            <a href="{{ url_for('main.set_lang', lang='en') }}" class="lang-link {% if current_lang == 'en' %}active{% endif %}">EN</a>
+            <a href="{{ url_for('main.set_lang', lang='hu') }}" class="lang-link {% if current_lang == 'hu' %}active{% endif %}">HU</a>
+            <a href="/login" class="nav-cta">Sign In</a>
+        </div>
+    </nav>
+
+    <div class="hero">
+        <h1>PRISM&trade; Protein Intelligence Suite</h1>
+        <p>{{ _('landing_hero_subtitle') }}</p>
+        <div class="hero-badges">
+            <span class="hero-badge accent">BioPython</span>
+            <span class="hero-badge">Mol* 3D Viewer</span>
+            <span class="hero-badge">RCSB PDB</span>
+            <span class="hero-badge">PDF/CSV Export</span>
+            <span class="hero-badge">SaaS Ready</span>
+        </div>
+        <div class="hero-cta">
+            <a href="/login" class="primary">{{ _('landing_start_analysis') }}</a>
+            <a href="/register" class="secondary">{{ _('landing_create_account') }}</a>
+        </div>
+    </div>
+
+    <hr>
+
+    <section>
+        <div class="container">
+            <h2 class="section-title">{{ _('landing_what_prism_can_do') }}</h2>
+            <p class="section-sub">{{ _('landing_professional_toolkit') }}</p>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">&sum;</div>
+                    <h3>{{ _('landing_feature_quant_title') }}</h3>
+                    <p>{{ _('landing_feature_quant_desc') }}</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#x1F30D;</div>
+                    <h3>{{ _('landing_feature_3d_title') }}</h3>
+                    <p>{{ _('landing_feature_3d_desc') }}</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#x1F9EC;</div>
+                    <h3>{{ _('landing_feature_mutation_title') }}</h3>
+                    <p>{{ _('landing_feature_mutation_desc') }}</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#x1F4CA;</div>
+                    <h3>{{ _('landing_feature_comparison_title') }}</h3>
+                    <p>{{ _('landing_feature_comparison_desc') }}</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#x1F4E5;</div>
+                    <h3>{{ _('landing_feature_export_title') }}</h3>
+                    <p>{{ _('landing_feature_export_desc') }}</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">&#x1F4DD;</div>
+                    <h3>{{ _('landing_feature_notebook_title') }}</h3>
+                    <p>{{ _('landing_feature_notebook_desc') }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <section>
+        <div class="container">
+            <h2 class="section-title">{{ _('landing_how_it_works_title') }}</h2>
+            <p class="section-sub">{{ _('landing_how_it_works_subtitle') }}</p>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <h3>{{ _('landing_step1_title') }}</h3>
+                    <p>{{ _('landing_step1_desc') }}</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <h3>{{ _('landing_step2_title') }}</h3>
+                    <p>{{ _('landing_step2_desc') }}</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <h3>{{ _('landing_step3_title') }}</h3>
+                    <p>{{ _('landing_step3_desc') }}</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <section>
+        <div class="container">
+            <h2 class="section-title">{{ _('landing_tech_stack_title') }}</h2>
+            <p class="section-sub">{{ _('landing_tech_stack_subtitle') }}</p>
+            <div class="tech-grid">
+                <span class="tech-badge">Python 3</span>
+                <span class="tech-badge">Flask</span>
+                <span class="tech-badge">BioPython</span>
+                <span class="tech-badge">SQLite</span>
+                <span class="tech-badge">fpdf2</span>
+                <span class="tech-badge">Mol* Viewer</span>
+                <span class="tech-badge">RCSB PDB API</span>
+                <span class="tech-badge">Docker</span>
+                <span class="tech-badge">Conda</span>
+            </div>
+        </div>
+    </section>
+
+    <hr>
+
+    <footer>
+        <p>PRISM&trade; Protein Intelligence Suite &mdash; {{ _('enterprise_molecular_diagnostics') }}</p>
+        <p style="margin-top:8px;">&copy; 2026 &mdash; <a href="/login" style="color:#64748b;text-decoration:none;">Sign In</a> &middot; <a href="/register" style="color:#64748b;text-decoration:none;">Register</a></p>
+    </footer>
+</body>
+</html>

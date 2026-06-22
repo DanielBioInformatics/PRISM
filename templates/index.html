@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="{{ html_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRISM™ Protein Intelligence Suite</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/pdbe-molstar@latest/build/pdbe-molstar.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/pdbe-molstar@latest/build/pdbe-molstar-component.js"></script>
+    <style>
+        :root {
+            --bg-main: #060913;
+            --bg-card: #0f1424;
+            --bg-input: #171e36;
+            --border-color: #222f54;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-indigo: #6366f1;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --text-light: #f1f5f9;
+            --text-muted: #64748b;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-light);
+            margin: 0;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* ===== LIGHT THEME ===== */
+        [data-theme="light"] {
+            --bg-main: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-input: #e2e8f0;
+            --border-color: #cbd5e1;
+            --text-light: #0f172a;
+            --text-muted: #64748b;
+        }
+        [data-theme="light"] .logo-title h1 {
+            background: linear-gradient(to right, #0891b2, #4f46e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        [data-theme="light"] .status-badge {
+            background-color: #05966920;
+            border-color: #059669;
+            color: #059669;
+        }
+        [data-theme="light"] .tab-btn.active {
+            background: #ffffff;
+            box-shadow: 0 -1px 0 #ffffff, 0 2px 0 var(--accent-cyan);
+        }
+        [data-theme="light"] .kpi-box { background: #f8fafc; }
+        [data-theme="light"] input[type="text"],
+        [data-theme="light"] input[type="number"],
+        [data-theme="light"] textarea,
+        [data-theme="light"] select { background: #ffffff; color: #0f172a; }
+        [data-theme="light"] .pdb-suggestions { background: #ffffff; }
+        [data-theme="light"] .pdb-suggestion:hover,
+        [data-theme="light"] .pdb-suggestion.active { background: #f1f5f9; }
+        [data-theme="light"] .pdb-suggestion { border-bottom-color: #e2e8f0; }
+        [data-theme="light"] .pdb-suggestion .pdb-badge { background: #f1f5f9; }
+        [data-theme="light"] .pdb-no-results { color: var(--text-muted); }
+        [data-theme="light"] .aa-group-card { background: #f8fafc; }
+        [data-theme="light"] .bio-card { background: #f0f9ff; border-color: #bae6fd; }
+        [data-theme="light"] .bio-card .report-title { color: #0891b2; }
+        [data-theme="light"] .bio-card p { color: #334155; }
+        [data-theme="light"] .bio-card.card-charge { background: #eff6ff; border-color: #93c5fd; }
+        [data-theme="light"] .bio-card.card-charge .report-title { color: #2563eb; }
+        [data-theme="light"] .bio-card.card-stable { background: #f0fdf4; border-color: #86efac; }
+        [data-theme="light"] .bio-card.card-stable .report-title { color: #16a34a; }
+        [data-theme="light"] .bio-card.card-unstable { background: #fdf2f8; border-color: #f9a8d4; }
+        [data-theme="light"] .bio-card.card-unstable .report-title { color: #e11d48; }
+        [data-theme="light"] .num-highlight { color: #2563eb; }
+        [data-theme="light"] .hist-card { background: #f8fafc; }
+        [data-theme="light"] .hist-card:hover { box-shadow: 0 0 12px rgba(6,182,212,0.1); }
+        [data-theme="light"] .comp-table th { background: #f1f5f9; }
+        [data-theme="light"] .comp-table td { border-bottom-color: #e2e8f0; color: #334155; }
+        [data-theme="light"] .comp-bar-track { background: #e2e8f0; }
+        [data-theme="light"] .notes-table th { background: #f1f5f9; }
+        [data-theme="light"] .notes-table td { border-bottom-color: #e2e8f0; }
+        [data-theme="light"] .viewer-container { background: #f8fafc; border-color: var(--border-color); }
+        [data-theme="light"] .mut-btn-loading { background: linear-gradient(135deg, #fecaca, #fca5a5) !important; }
+        [data-theme="light"] .aa-progress-bg,
+        [data-theme="light"] .topo-bar-bg { background: #e2e8f0; }
+        [data-theme="light"] button.primary { box-shadow: 0 4px 12px rgba(79,70,229,0.2); }
+        [data-theme="light"] .card-title { color: #0891b2; }
+        .container { max-width: 1440px; margin: 0 auto; padding: 20px 28px; }
+        @media (max-width: 768px) { .container { padding: 14px 14px; } }
+
+        header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 18px; margin-bottom: 0; }
+        .logo-title h1 { font-size: 24px; font-weight: 800; background: linear-gradient(to right, #06b6d4, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 0; }
+        .logo-title p { color: var(--text-muted); margin: 3px 0 0 0; font-size: 12px; }
+        .status-badge { background-color: #10b98120; border: 1px solid var(--accent-emerald); color: var(--accent-emerald); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+
+        /* ===== TAB NAV ===== */
+        .tab-nav { display: flex; gap: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 0; margin-bottom: 28px; margin-top: 4px; }
+        .tab-btn {
+            padding: 10px 22px; font-size: 13px; font-weight: 700; cursor: pointer; border: none;
+            background: transparent; color: var(--text-muted); border-radius: 8px 8px 0 0;
+            transition: all 0.15s; letter-spacing: 0.3px; position: relative;
+        }
+        .tab-btn:hover { color: var(--text-light); background: #1e293b40; }
+        .tab-btn.active {
+            color: var(--accent-cyan); background: #0f1424;
+            box-shadow: 0 -1px 0 #0f1424, 0 2px 0 var(--accent-cyan);
+        }
+        .tab-btn .tab-dot {
+            display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ===== CARDS ===== */
+        .card { background-color: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 24px; box-shadow: 0 8px 20px -5px rgba(0,0,0,0.25); }
+        .card-title { font-size: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--accent-cyan); margin: 0 0 18px 0; border-left: 3px solid var(--accent-indigo); padding-left: 10px; }
+
+        /* ===== 12-COLUMN GRID ===== */
+        .grid-12 { display: grid; grid-template-columns: repeat(12, 1fr); gap: 24px; }
+        .col-1 { grid-column: span 1; } .col-2 { grid-column: span 2; } .col-3 { grid-column: span 3; }
+        .col-4 { grid-column: span 4; } .col-5 { grid-column: span 5; } .col-6 { grid-column: span 6; }
+        .col-7 { grid-column: span 7; } .col-8 { grid-column: span 8; } .col-9 { grid-column: span 9; }
+        .col-10 { grid-column: span 10; } .col-11 { grid-column: span 11; } .col-12 { grid-column: span 12; }
+        @media (max-width: 1024px) {
+            .grid-12 { grid-template-columns: repeat(6, 1fr); }
+            .col-1,.col-2,.col-3,.col-4,.col-5 { grid-column: span 3; }
+            .col-6,.col-7,.col-8,.col-9,.col-10,.col-11 { grid-column: span 6; }
+            .col-12 { grid-column: span 6; }
+        }
+        @media (max-width: 640px) {
+            .grid-12 { grid-template-columns: 1fr; gap: 16px; }
+            .col-1,.col-2,.col-3,.col-4,.col-5,.col-6,.col-7,.col-8,.col-9,.col-10,.col-11,.col-12 { grid-column: 1; }
+        }
+
+        /* ===== CARD CONTAINER (responsive flex grid) ===== */
+        .card-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .card-container > .card { margin: 0; }
+        .card-container > .span-2 { grid-column: span 2; }
+        .card-container > .full { grid-column: 1 / -1; }
+        @media (max-width: 1024px) { .card-container { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 640px) { .card-container { grid-template-columns: 1fr; } .card-container > .span-2 { grid-column: 1; } }
+
+        /* Keeps 3D viewer + param form in fixed ratio */
+        .param-col { position: sticky; top: 20px; }
+
+        textarea { width: 100%; height: 150px; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-light); padding: 14px; font-family: monospace; font-size: 13px; box-sizing: border-box; resize: vertical; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 11px 14px; background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-light); box-sizing: border-box; font-size: 14px; }
+        select { width:100%; padding: 11px 14px; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; color: var(--text-light); font-size: 14px; }
+        button.primary { background: linear-gradient(135deg, var(--accent-indigo), var(--accent-cyan)); color: white; border: none; padding: 13px 20px; font-size: 14px; font-weight: 700; border-radius: 10px; cursor: pointer; width: 100%; box-shadow: 0 4px 12px rgba(99,102,241,0.3); transition: opacity 0.15s; }
+        button.primary:hover { opacity: 0.92; }
+
+
+
+        .viewer-container { position: relative; width: 100%; height: 520px; background-color: #020408; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); }
+        pdbe-molstar { width: 100%; height: 100%; display: block; }
+
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--text-muted); text-align: center; min-height: 200px; }
+        .empty-state p { font-size: 16px; font-weight: 600; margin: 0 0 4px 0; }
+        .empty-state span { font-size: 13px; }
+
+        /* ===== KPI GRID ===== */
+        .kpi-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 12px; margin-bottom: 20px; }
+        .kpi-box { background-color: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 14px 12px; text-align: center; }
+        .kpi-label { font-size: 10px; color: var(--text-muted); text-transform: uppercase; font-weight: 600; }
+        .kpi-value { font-size: 20px; font-weight: 800; color: var(--text-light); margin-top: 4px; }
+        .kpi-box.highlight .kpi-value { color: var(--accent-cyan); }
+        @media (max-width: 900px) { .kpi-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 600px) { .kpi-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .badge { padding: 3px 9px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+        .badge-stable { background-color: #10b98120; color: var(--accent-emerald); border: 1px solid var(--accent-emerald); }
+        .badge-unstable { background-color: #f43f5e20; color: var(--accent-rose); border: 1px solid var(--accent-rose); }
+
+        .topo-container { margin-bottom: 12px; }
+        .topo-hdr { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; }
+        .topo-bar-bg { background: #0b0f19; height: 8px; border-radius: 4px; width: 100%; overflow: hidden; }
+        .topo-bar-fill { height: 100%; border-radius: 4px; }
+
+        .bio-card {
+            background-color: #1e1b4b30; border: 1px solid #312e81; border-radius: 10px;
+            padding: 20px; display: flex; flex-direction: column;
+        }
+        .bio-card .report-title { color: var(--accent-cyan); font-weight: 700; font-size: 13px; margin-bottom: 10px; }
+        .bio-card p { margin: 0; font-size: 13px; line-height: 1.6; color: #cbd5e1; flex: 1; }
+        .bio-card.card-charge { border-color: #1e3a8a; background-color: #1e3a8a10; }
+        .bio-card.card-charge .report-title { color: #60a5fa; }
+        .bio-card.card-stable { border-color: #065f46; background-color: #065f4610; }
+        .bio-card.card-stable .report-title { color: var(--accent-emerald); }
+        .bio-card.card-unstable { border-color: #9f1239; background-color: #9f123910; }
+        .bio-card.card-unstable .report-title { color: var(--accent-rose); }
+        .num-highlight { color: var(--accent-cyan); font-weight: 700; }
+        .report-title { color: var(--accent-cyan); font-weight: 700; font-size: 13px; margin-bottom: 6px; }
+
+        .aa-grid-matrix { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 16px; }
+        .aa-group-card { background: #0b0f19; border: 1px solid var(--border-color); border-radius: 10px; padding: 14px; }
+        .aa-group-title { font-size: 11px; color: var(--text-muted); font-weight: 700; margin-bottom: 10px; border-bottom: 1px solid var(--border-color); padding-bottom: 5px; }
+        .aa-mini-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px; }
+        .aa-label-code { font-family: monospace; width: 50px; font-weight: 600; flex-shrink: 0; }
+        .aa-progress-bg { flex: 1; background: var(--bg-input); height: 7px; border-radius: 4px; overflow: hidden; min-width: 50px; }
+        .aa-progress-fill { background: linear-gradient(90deg, var(--accent-indigo), var(--accent-cyan)); height: 100%; border-radius: 4px; max-width: 100%; }
+        .aa-pct-val { font-family: monospace; width: 40px; text-align: right; color: var(--accent-cyan); flex-shrink: 0; }
+
+        /* ===== RESULTS SUB-GRID ===== */
+        .results-subgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+        .bio-container { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+        .bio-container > .bio-card { margin: 0; }
+        @media (max-width: 900px) { .results-subgrid, .bio-container { grid-template-columns: 1fr; } }
+
+        /* ===== RESEARCH TOOLBOX ===== */
+        .toolbox-tabs { display: flex; gap: 2px; border-bottom: 1px solid var(--border-color); margin-bottom: 20px; }
+        .toolbox-tab {
+            padding: 9px 18px; font-size: 12px; font-weight: 700; cursor: pointer; border: none;
+            background: transparent; color: var(--text-muted); border-radius: 6px 6px 0 0;
+            transition: all 0.15s;
+        }
+        .toolbox-tab:hover { color: var(--text-light); background: #1e293b30; }
+        .toolbox-tab.active { color: var(--accent-amber); background: #0b0f19; box-shadow: 0 2px 0 var(--accent-amber); }
+        .toolbox-pane { display: none; }
+        .toolbox-pane.active { display: block; }
+
+        /* ===== HISTORY CHECKBOXES ===== */
+        .hist-item { display: flex; align-items: stretch; gap: 10px; }
+        .hist-item .check-wrap { display: flex; align-items: center; }
+        .hist-item input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-amber); cursor: pointer; }
+        .hist-item a { text-decoration: none; color: inherit; display: block; flex: 1; }
+        .hist-card { background: var(--bg-input); padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 13px; cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; }
+        .hist-card:hover { transform: translateX(4px); box-shadow: 0 0 12px rgba(6,182,212,0.15); }
+
+        /* ===== COMPARE TABLE ===== */
+        .comp-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 16px; font-size: 13px; }
+        .comp-table th { text-align: left; padding: 10px 14px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--border-color); background: #0b0f19; white-space: nowrap; }
+        .comp-table th:first-child { border-radius: 8px 0 0 0; }
+        .comp-table th:last-child { border-radius: 0 8px 0 0; }
+        .comp-table td { padding: 10px 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; }
+        .comp-table tr:last-child td { border-bottom: none; }
+        .comp-table .row-label { color: var(--text-muted); font-weight: 600; width: 160px; }
+        .comp-table .delta-pos { color: var(--accent-emerald); font-weight: 700; }
+        .comp-table .delta-neg { color: var(--accent-rose); font-weight: 700; }
+        .comp-table .delta-neu { color: var(--text-muted); }
+
+        .comp-bar-row { display: flex; align-items: center; gap: 8px; margin: 4px 0; }
+        .comp-bar-track { flex: 1; height: 18px; background: #0b0f19; border-radius: 4px; overflow: hidden; }
+        .comp-bar-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+        .comp-bar-val { font-family: monospace; font-size: 12px; width: 60px; text-align: right; flex-shrink: 0; }
+        .comp-pdb-tag { font-family: monospace; font-size: 10px; color: var(--text-muted); width: 50px; text-align: right; flex-shrink: 0; }
+
+        /* ===== LAB NOTES TABLE ===== */
+        .notes-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+        .notes-table th { text-align: left; padding: 10px 14px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; border-bottom: 1px solid var(--border-color); background: #0b0f19; }
+        .notes-table th:first-child { border-radius: 8px 0 0 0; }
+        .notes-table th:last-child { border-radius: 0 8px 0 0; }
+        .notes-table td { padding: 10px 14px; border-bottom: 1px solid #1e293b; color: #cbd5e1; vertical-align: top; }
+        .notes-table .note-text { color: #94a3b8; font-style: italic; max-width: 400px; white-space: pre-wrap; }
+
+        @keyframes neon-pulse {
+            0%, 100% { box-shadow: 0 0 8px rgba(244,63,94,0.3), 0 0 16px rgba(244,63,94,0.1); border-color: var(--accent-rose); }
+            50% { box-shadow: 0 0 20px rgba(244,63,94,0.6), 0 0 40px rgba(244,63,94,0.2), 0 0 60px rgba(244,63,94,0.1); border-color: #f43f5e; }
+        }
+        .mut-btn-loading {
+            animation: neon-pulse 1.2s ease-in-out infinite !important;
+            pointer-events: none !important; opacity: 0.85 !important;
+            background: linear-gradient(135deg, #881337, #4c0519) !important;
+        }
+
+/* ===== PDB AUTOCOMPLETE ===== */
+        .pdb-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: #171e36;
+            border: 1px solid var(--border-color);
+            border-radius: 0 0 10px 10px;
+            max-height: 280px;
+            overflow-y: auto;
+            display: none;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        .pdb-suggestions.show { display: block; }
+        .pdb-suggestion {
+            padding: 10px 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #1e293b;
+            transition: background 0.1s;
+        }
+        .pdb-suggestion:last-child { border-bottom: none; border-radius: 0 0 10px 10px; }
+        .pdb-suggestion:hover, .pdb-suggestion.active { background: #1e293b; }
+        .pdb-suggestion .pid { font-family: monospace; font-weight: 700; color: var(--accent-cyan); font-size: 13px; flex-shrink: 0; }
+        .pdb-suggestion .ptitle { font-size: 11px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .pdb-suggestion .pdb-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; background: #0f1424; color: var(--text-muted); border: 1px solid var(--border-color); }
+        .pdb-no-results { padding: 16px; text-align: center; color: var(--text-muted); font-size: 12px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <div class="logo-title">
+            <h1>PRISM™ Protein Intelligence Suite</h1>
+            <p>{{ _('enterprise_molecular_diagnostics') }}</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;">
+            {% if username %}
+            <span style="color:var(--text-muted);font-size:13px;">{{ username }}</span>
+            <a href="/logout" style="text-decoration:none;color:var(--accent-rose);font-size:12px;font-weight:600;padding:5px 12px;border:1px solid var(--accent-rose);border-radius:20px;transition:all 0.15s;" onmouseover="this.style.background='#f43f5e20';" onmouseout="this.style.background='';">{{ _('logout') }}</a>
+            {% endif %}
+            <button id="theme-toggle" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--border-color);background:var(--bg-input);color:var(--text-light);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;" title="{{ _('theme_toggle_title') }}">🌙</button>
+            <div class="status-badge">{{ _('research_node_active') }}</div>
+        </div>
+    </header>
+
+    <!-- ===== TAB NAVIGATION ===== -->
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab('analysis', this)">
+            <span class="tab-dot" style="background:var(--accent-cyan);"></span>{{ _('analysis_tab') }}
+        </button>
+        <button class="tab-btn" onclick="switchTab('compare', this)">
+            <span class="tab-dot" style="background:var(--accent-amber);"></span>{{ _('compare_tab') }}
+        </button>
+        <button class="tab-btn" onclick="switchTab('labnotes', this)">
+            <span class="tab-dot" style="background:var(--accent-emerald);"></span>{{ _('lab_notes_tab') }}
+        </button>
+    </div>
+
+    <!-- ===== TAB: ELEMZÉS (DASHBOARD) ===== -->
+    <div class="tab-content active" id="tab-analysis">
+        <div class="grid-12">
+            <!-- Left: Form + History -->
+            <div class="col-4 param-col">
+                <div class="card" style="margin-bottom:20px;">
+                    <h3 class="card-title">{{ _('parameters_title') }}</h3>
+                    <form method="POST" id="seq-form" action="/app">
+                        <div style="margin-bottom:16px;">
+                            <label style="font-weight:600;font-size:12px;display:block;margin-bottom:6px;color:#94a3b8;">{{ _('sequence_label') }}</label>
+                            <textarea name="sequence" required placeholder="{{ _('sequence_placeholder') }}">{{ sequence }}</textarea>
+                        </div>
+                        <div style="margin-bottom:20px;position:relative;">
+                            <label style="font-weight:600;font-size:12px;display:block;margin-bottom:6px;color:#94a3b8;">{{ _('pdb_code_label') }}</label>
+                            <input type="text" name="pdb_id" id="pdb-input" value="{{ pdb_id }}" placeholder="{{ _('pdb_placeholder') }}" autocomplete="off">
+                            <div id="pdb-suggestions" class="pdb-suggestions"></div>
+                        </div>
+                        <button class="primary" type="submit">{{ _('run_analysis_button') }}</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title" style="color:var(--accent-amber);border-color:var(--accent-amber);">{{ _('recent_analyses') }}</h3>
+                    {% if history %}
+                    <div style="margin-bottom:12px;display:flex;gap:8px;align-items:center;">
+                        <span style="font-size:11px;color:var(--text-muted);">{{ _('select_for_compare') }}</span>
+                        <button id="compare-btn" onclick="doCompare()" disabled style="width:auto;padding:5px 12px;font-size:11px;background:linear-gradient(135deg,var(--accent-amber),#d97706);box-shadow:0 4px 12px rgba(245,158,11,0.3);">{{ _('compare_button') }}</button>
+                    </div>
+                    {% for item in history %}
+                    <div class="hist-item">
+                        <div class="check-wrap"><input type="checkbox" class="hist-check" value="{{ item[0] }}" onchange="toggleCompare()"></div>
+                        <a href="/app?load_id={{ item[0] }}">
+                            <div class="hist-card">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+<strong style="color:var(--accent-cyan);font-family:monospace;">{{ _('pdb_prefix', id=item[1].upper()) }}</strong>
+                                    <span style="display:flex;align-items:center;gap:6px;">
+{% if item[6] %}<span style="background:var(--accent-indigo);color:white;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;">{{ _('version_prefix', num=item[6]) }}</span>{% endif %}
+                                        <span style="color:var(--text-muted);font-size:11px;">{{ item[5] }}</span>
+                                    </span>
+                                </div>
+                                <div style="color:#cbd5e1;display:flex;justify-content:space-between;font-size:12px;">
+                                    <span>{{ _('length_label') }} <strong>{{ item[2] }} aa</strong></span>
+                                    <span>{{ _('weight_label') }} <strong>{{ item[3] }} Da</strong></span>
+                                </div>
+                                <div style="margin-top:4px;text-align:right;">
+                                    <span class="badge {{ 'badge-stable' if item[4] == 'STABIL' else 'badge-unstable' }}" style="padding:2px 6px;font-size:10px;">{{ _('stability_stable') if item[4] == 'STABIL' else _('stability_unstable') }}</span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p style="color:var(--text-muted);font-size:13px;margin:0;text-align:center;padding:15px 0;">{{ _('no_saved_projects') }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Right: 3D Viewer -->
+            <div class="col-8">
+                {% if results and not results.error and pdb_id %}
+                <div class="card" style="padding:0;overflow:hidden;">
+                    <div class="viewer-container" id="molstar-container">
+                        <pdbe-molstar molecule-id="{{ pdb_id }}" hide-controls="false" subscribe-events="true"></pdbe-molstar>
+                    </div>
+                    <div style="padding:12px 18px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border-color);">
+                        <span style="font-size:12px;color:var(--text-muted);">{{ _('molstar_3d') }} {{ pdb_id.upper() }}</span>
+                        <button onclick="capture3DView('{{ pdb_id }}')" style="width:auto;padding:6px 14px;font-size:11px;background:linear-gradient(135deg,#0f1424,#1e293b);border:1px solid var(--accent-indigo);">{{ _('3d_snapshot') }}</button>
+                    </div>
+                </div>
+                {% elif results and not results.error %}
+                <div class="card">
+                    <div class="empty-state" style="padding:50px 20px;">
+                        <p>{{ _('3d_not_available') }}</p>
+                        <span>{{ _('add_pdb_for_3d') }}</span>
+                    </div>
+                </div>
+                {% else %}
+                <div class="card" style="height:100%;">
+                    <div class="empty-state">
+                        <p>{{ _('no_active_project') }}</p>
+                        <span>{{ _('enter_sequence_to_start') }}</span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if results and not results.error %}
+        <div class="card-container" style="margin-top:24px;">
+            <!-- Analysis Card (span-2 on desktop) -->
+            <div class="card span-2">
+                <div class="card-title">{{ _('analysis_title') }}</div>
+
+                <div class="kpi-grid">
+                    <div class="kpi-box highlight"><div class="kpi-label">{{ _('sequence_length_kpi') }}</div><div class="kpi-value">{{ results.length }} aa</div></div>
+                    <div class="kpi-box"><div class="kpi-label">{{ _('molecular_weight_kpi') }}</div><div class="kpi-value">{{ results.weight }} Da</div></div>
+                    <div class="kpi-box"><div class="kpi-label">{{ _('isoelectric_point_kpi') }}</div><div class="kpi-value">{{ results.pi }}</div></div>
+                    <div class="kpi-box"><div class="kpi-label">GRAVY</div><div class="kpi-value" style="color:{% if results.gravy > 0 %}var(--accent-amber){% else %}var(--accent-cyan){% endif %};">{{ results.gravy }}</div></div>
+                    <div class="kpi-box"><div class="kpi-label">{{ _('aromaticity_kpi') }}</div><div class="kpi-value">{{ results.aromaticity }}%</div></div>
+                    <div class="kpi-box"><div class="kpi-label">{{ _('instability_kpi') }}</div><div class="kpi-value" style="font-size:17px;"><span class="badge {{ 'badge-stable' if results.is_stable else 'badge-unstable' }}">{{ _('stability_stable') if results.is_stable else _('stability_unstable') }}</span></div></div>
+                </div>
+
+                <div class="results-subgrid">
+                    <div class="kpi-box" style="text-align:left;">
+                        <div class="kpi-label" style="margin-bottom:12px;">{{ _('secondary_structure') }}</div>
+                        <div class="topo-container"><div class="topo-hdr"><span>{{ _('alpha_helix') }}</span><strong>{{ results.helix }}%</strong></div><div class="topo-bar-bg"><div class="topo-bar-fill" style="width:{{ results.helix }}%;background:var(--accent-emerald);"></div></div></div>
+                        <div class="topo-container"><div class="topo-hdr"><span>{{ _('beta_sheet') }}</span><strong>{{ results.sheet }}%</strong></div><div class="topo-bar-bg"><div class="topo-bar-fill" style="width:{{ results.sheet }}%;background:var(--accent-indigo);"></div></div></div>
+                        <div class="topo-container"><div class="topo-hdr"><span>{{ _('loop_turn') }}</span><strong>{{ results.turn }}%</strong></div><div class="topo-bar-bg"><div class="topo-bar-fill" style="width:{{ results.turn }}%;background:var(--accent-cyan);"></div></div></div>
+                    </div>
+                    <div class="kpi-box" style="text-align:left;">
+                        <div class="kpi-label" style="margin-bottom:12px;">{{ _('spectroscopic_characterization') }}</div>
+                        <p style="font-size:12px;margin:0 0 8px 0;color:var(--text-muted);">{{ _('extinction_coefficient') }}</p>
+                        <div style="font-family:monospace;font-size:13px;background:var(--bg-main);padding:10px;border-radius:8px;border:1px solid var(--border-color);">
+                            <div style="margin-bottom:4px;"><span style="color:var(--accent-cyan);">{{ _('cys_reduced') }}</span> <strong style="float:right;color:var(--text-light);">{{ results.ext_reduced }} M⁻¹cm⁻¹</strong></div>
+                            <div><span style="color:var(--accent-amber);">{{ _('cys_disulfide') }}</span> <strong style="float:right;color:var(--text-light);">{{ results.ext_oxidized }} M⁻¹cm⁻¹</strong></div>
+                        </div>
+                    </div>
+                </div>
+
+                    <div class="bio-container">
+                    <div class="bio-card">
+                        <div class="report-title">{{ _('drug_target_strategy') }}</div>
+                        <p>{{ results.strategy_text }}</p>
+                    </div>
+                    <div class="bio-card card-charge">
+                        <div class="report-title">{{ _('electrostatic_complementarity') }}</div>
+                        <p>{{ results.charge_info_text }}</p>
+                    </div>
+                    <div class="bio-card {% if results.is_stable %}card-stable{% else %}card-unstable{% endif %}">
+                        <div class="report-title">{{ _('structural_stability') }}</div>
+                        <p>{{ results.stability_info_text }}</p>
+                    </div>
+                </div>
+
+                <div class="card-title" style="margin-top:10px;border-color:var(--accent-cyan);">{{ _('aa_residue_distribution') }}</div>
+                <div class="aa-grid-matrix">
+                    {% for group_name, residues in results.aa_groups.items() %}
+                    <div class="aa-group-card">
+                        <div class="aa-group-title">{{ _(group_name) }}</div>
+                        {% for aa in residues %}
+                        <div class="aa-mini-bar">
+                            <span class="aa-label-code">{{ aa.c3 }} ({{ aa.c1 }})</span>
+                            <div class="aa-progress-bg"><div class="aa-progress-fill" style="width:{{ aa.pct }}%;"></div></div>
+                            <span class="aa-pct-val">{{ aa.pct }}%</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Research Toolbox Card -->
+            <div class="card">
+                <div class="card-title" style="color:var(--accent-amber);border-color:var(--accent-amber);">{{ _('research_toolbox') }}</div>
+                <div class="toolbox-tabs">
+                    <button class="toolbox-tab active" onclick="switchToolbox('mutation', this)">{{ _('mutation_tab') }}</button>
+                    <button class="toolbox-tab" onclick="switchToolbox('export', this)">{{ _('export_tab') }}</button>
+                    <button class="toolbox-tab" onclick="switchToolbox('notes', this)">{{ _('notes_tab') }}</button>
+                    <button class="toolbox-tab" onclick="switchToolbox('versions', this)">{{ _('versions_tab') }}</button>
+                </div>
+
+                <div class="toolbox-pane active" id="tb-mutation">
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:11px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:4px;">{{ _('position_label') }}</label>
+                        <input type="number" id="mut-pos" min="1" max="{{ results.length }}" value="1">
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:11px;color:var(--text-muted);font-weight:600;display:block;margin-bottom:4px;">{{ _('new_aa_label') }}</label>
+                        <select id="mut-aa">
+                            <option value="A">Ala (A)</option><option value="C">Cys (C)</option><option value="D">Asp (D)</option>
+                            <option value="E">Glu (E)</option><option value="F">Phe (F)</option><option value="G">Gly (G)</option>
+                            <option value="H">His (H)</option><option value="I">Ile (I)</option><option value="K">Lys (K)</option>
+                            <option value="L">Leu (L)</option><option value="M">Met (M)</option><option value="N">Asn (N)</option>
+                            <option value="P">Pro (P)</option><option value="Q">Gln (Q)</option><option value="R">Arg (R)</option>
+                            <option value="S">Ser (S)</option><option value="T">Thr (T)</option><option value="V">Val (V)</option>
+                            <option value="W">Trp (W)</option><option value="Y">Tyr (Y)</option>
+                        </select>
+                    </div>
+                    <button id="mut-btn" style="margin-bottom:14px;padding:10px;font-size:13px;background:linear-gradient(135deg,var(--accent-rose),#be123c);box-shadow:0 4px 12px rgba(244,63,94,0.3);">{{ _('run_mutation_button') }}</button>
+                    <div id="mut-results" style="display:none;">
+                        <div style="background:#0b0f19;border:1px solid var(--border-color);border-radius:10px;padding:12px;margin-bottom:8px;">
+                            <div style="font-size:11px;color:var(--accent-cyan);font-weight:700;margin-bottom:8px;">{{ _('original_label') }}</div>
+                            <div id="mut-orig" style="font-size:12px;color:#cbd5e1;"></div>
+                        </div>
+                        <div style="background:#0b0f19;border:1px solid var(--accent-rose);border-radius:10px;padding:12px;">
+                            <div id="mut-label" style="font-size:11px;color:var(--accent-rose);font-weight:700;margin-bottom:8px;">{{ _('mutant_label') }}</div>
+                            <div id="mut-mutant" style="font-size:12px;color:#cbd5e1;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbox-pane" id="tb-export">
+                    <p style="font-size:13px;color:var(--text-muted);margin:0 0 14px 0;">{{ _('export_description') }}</p>
+                    <form method="POST" action="/download_csv" style="margin-bottom:10px;">
+                        <input type="hidden" name="sequence" value="{{ sequence }}">
+                        <input type="hidden" name="pdb_id" value="{{ pdb_id }}">
+                        <input type="hidden" name="notes" value="{{ notes }}">
+                        <button type="submit" style="padding:10px;font-size:12px;background:linear-gradient(135deg,#0f1424,#1e293b);border:1px solid var(--accent-amber);">CSV Export</button>
+                    </form>
+                    <form method="POST" action="/download_pdf">
+                        <input type="hidden" name="sequence" value="{{ sequence }}">
+                        <input type="hidden" name="pdb_id" value="{{ pdb_id }}">
+                        <input type="hidden" name="notes" value="{{ notes }}">
+                        <button type="submit" style="padding:10px;font-size:12px;background:linear-gradient(135deg,var(--accent-emerald),#059669);box-shadow:0 4px 12px rgba(16,185,129,0.3);">{{ _('pdf_report') }}</button>
+                    </form>
+                </div>
+
+                <div class="toolbox-pane" id="tb-notes">
+                    <p style="font-size:13px;color:var(--text-muted);margin:0 0 10px 0;">{{ _('notes_description') }}</p>
+                    <textarea id="lab-notes" style="height:80px;">{{ notes }}</textarea>
+                    <input type="hidden" id="notes-entry-id" value="{{ entry_id or '' }}">
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:8px;">
+                        <span id="notes-status" style="display:none;font-size:12px;"></span>
+                        <button id="notes-save-btn" type="button" style="width:auto;padding:7px 16px;font-size:12px;background:linear-gradient(135deg,var(--accent-cyan),#0891b2);">{{ _('save') }}</button>
+                    </div>
+                </div>
+
+                <div class="toolbox-pane" id="tb-versions">
+                    <p style="font-size:13px;color:var(--text-muted);margin:0 0 10px 0;">{{ _('versions_description') }}</p>
+                    <div id="version-list">
+                        {% if versions %}
+                        {% for v in versions %}
+                        <a href="/app?load_id={{ v[0] }}" style="text-decoration:none;color:inherit;display:block;">
+                            <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg-input);border:1px solid var(--border-color);border-radius:8px;margin-bottom:6px;transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent-cyan)'" onmouseout="this.style.borderColor=''">
+                                <span style="background:{% if v[6] == versions[-1][6] %}var(--accent-emerald){% else %}var(--accent-indigo){% endif %};color:white;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;flex-shrink:0;">v{{ v[6] }}</span>
+                                <div style="flex:1;">
+                                    <div style="font-size:11px;color:var(--text-muted);">{{ v[5] }}</div>
+                                    <div style="font-size:11px;color:var(--text-light);"><strong>{{ v[2] }} aa</strong> · {{ v[3] }} Da · <span class="badge {{ 'badge-stable' if v[4] == 'STABIL' else 'badge-unstable' }}" style="font-size:9px;">{{ _('stability_stable') if v[4] == 'STABIL' else _('stability_unstable') }}</span></div>
+                                </div>
+                                {% if v[6] == versions[-1][6] %}<span style="font-size:9px;color:var(--accent-emerald);font-weight:700;">{{ _('current_version') }}</span>{% endif %}
+                            </div>
+                        </a>
+                        {% endfor %}
+                        {% else %}
+                        <p style="color:var(--text-muted);font-size:12px;text-align:center;padding:10px 0;">{{ _('no_version_data') }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- ===== TAB: ÖSSZEHASONLÍTÁS ===== -->
+    <div class="tab-content" id="tab-compare">
+        <div class="card">
+            <div class="card-title" style="color:var(--accent-amber);border-color:var(--accent-amber);">{{ _('compare_title') }}</div>
+            <div id="compare-history">
+                {% if history %}
+                <p style="font-size:13px;color:var(--text-muted);margin:0 0 14px 0;">{{ _('select_at_least_2_compare') }}</p>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:16px;">
+                    <button id="compare-btn-2" onclick="doCompareFromTab()" disabled style="width:auto;padding:8px 18px;font-size:12px;background:linear-gradient(135deg,var(--accent-amber),#d97706);box-shadow:0 4px 12px rgba(245,158,11,0.3);">{{ _('compare_selected_button') }}</button>
+                    <span id="compare-count" style="font-size:11px;color:var(--text-muted);">{{ _('selected_count', count=0) }}</span>
+                </div>
+                {% for item in history %}
+                <div class="hist-item" style="margin-bottom:8px;">
+                    <div class="check-wrap"><input type="checkbox" class="hist-check-2" value="{{ item[0] }}" onchange="toggleCompare2()"></div>
+                    <div class="hist-card" style="flex:1;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                            <strong style="color:var(--accent-cyan);font-family:monospace;">{{ _('pdb_prefix', id=item[1].upper()) }}</strong>
+                            <span style="display:flex;align-items:center;gap:6px;">
+                                {% if item[6] %}<span style="background:var(--accent-indigo);color:white;font-size:9px;font-weight:700;padding:1px 6px;border-radius:4px;">{{ _('version_prefix', num=item[6]) }}</span>{% endif %}
+                                <span style="color:var(--text-muted);font-size:11px;">{{ item[5] }}</span>
+                            </span>
+                        </div>
+                        <div style="color:#cbd5e1;display:flex;justify-content:space-between;font-size:12px;">
+                            <span>{{ _('th_length') }}: <strong>{{ item[2] }} aa</strong></span>
+                            <span>{{ _('th_weight') }}: <strong>{{ item[3] }} Da</strong></span>
+                        </div>
+                        <div style="margin-top:4px;text-align:right;">
+                            <span class="badge {{ 'badge-stable' if item[4] == 'STABIL' else 'badge-unstable' }}" style="padding:2px 6px;font-size:10px;">{{ _('stability_stable') if item[4] == 'STABIL' else _('stability_unstable') }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:30px 0;margin:0;">{{ _('no_saved_analyses_db') }}</p>
+                {% endif %}
+            </div>
+            <div id="compare-loading" style="display:none;text-align:center;padding:40px;"><p style="color:var(--text-muted);">{{ _('loading_analyses') }}</p></div>
+            <div id="compare-error" style="display:none;text-align:center;padding:30px;color:var(--accent-rose);"></div>
+            <div id="compare-content" style="display:none;"></div>
+        </div>
+    </div>
+
+    <!-- ===== TAB: LABORI NAPLÓ ===== -->
+    <div class="tab-content" id="tab-labnotes">
+        <div class="card">
+            <div class="card-title" style="color:var(--accent-emerald);border-color:var(--accent-emerald);">{{ _('lab_notes_title') }}</div>
+            {% if all_notes %}
+            <table class="notes-table">
+                <thead><tr>
+                    <th>{{ _('th_pdb_id') }}</th><th>{{ _('th_version') }}</th><th>{{ _('th_date') }}</th><th>{{ _('th_length') }}</th><th>{{ _('th_weight') }}</th><th>{{ _('th_stability') }}</th><th>{{ _('th_notes') }}</th>
+                </tr></thead>
+                <tbody>
+                    {% for n in all_notes %}
+                    <tr>
+                        <td style="font-family:monospace;color:var(--accent-cyan);font-weight:700;">{{ n[1].upper() }}</td>
+                        <td style="font-size:10px;"><span style="background:var(--accent-indigo);color:white;font-weight:700;padding:1px 6px;border-radius:4px;">v{{ n[7] if n|length > 7 else '?' }}</span></td>
+                        <td style="font-size:12px;color:var(--text-muted);">{{ n[2] }}</td>
+                        <td>{{ n[4] }} aa</td>
+                        <td>{{ n[5] }} Da</td>
+                        <td><span class="badge {{ 'badge-stable' if n[6] == 'STABIL' else 'badge-unstable' }}" style="font-size:10px;">{{ _('stability_stable') if n[6] == 'STABIL' else _('stability_unstable') }}</span></td>
+                        <td class="note-text">{{ n[3] }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p style="color:var(--text-muted);font-size:13px;text-align:center;padding:40px 0;margin:0;">{{ _('no_notes_yet') }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+const _translations = {{ js_translations|tojson }};
+function __(key) {
+    const val = _translations[key];
+    if (val === undefined || val === null) {
+        console.warn("Debug: Missing translation key:", key);
+        return key;
+    }
+    return val;
+}
+console.log("Debug: Translation object:", _translations);
+/* ===== THEME SWITCHER ===== */
+(function() {
+    const toggle = document.getElementById('theme-toggle');
+    if (!toggle) return;
+
+    function setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        toggle.textContent = theme === 'light' ? '☀️' : '🌙';
+        localStorage.setItem('prism-theme', theme);
+    }
+
+    const saved = localStorage.getItem('prism-theme');
+    if (saved) setTheme(saved);
+
+    toggle.addEventListener('click', function() {
+        const current = document.documentElement.getAttribute('data-theme');
+        setTheme(current === 'light' ? 'dark' : 'light');
+    });
+})();
+
+/* ===== TAB SWITCHING ===== */
+function switchTab(name, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+}
+
+/* ===== TOOLBOX SWITCHING ===== */
+function switchToolbox(name, btn) {
+    document.querySelectorAll('.toolbox-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.toolbox-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tb-' + name).classList.add('active');
+}
+
+/* ===== COMPARE CHECKBOXES (Dashboard) ===== */
+function toggleCompare() {
+    const checks = document.querySelectorAll('.hist-check:checked');
+    document.getElementById('compare-btn').disabled = checks.length < 2;
+}
+
+function doCompare() {
+    const checks = document.querySelectorAll('.hist-check:checked');
+    if (checks.length < 2) return;
+    const ids = Array.from(checks).map(c => c.value).join(',');
+    switchTab('compare', document.querySelector('.tab-btn:nth-child(2)'));
+    fetchCompare(ids);
+}
+
+/* ===== COMPARE CHECKBOXES (Compare tab) ===== */
+function toggleCompare2() {
+    const checks = document.querySelectorAll('.hist-check-2:checked');
+    document.getElementById('compare-btn-2').disabled = checks.length < 2;
+    document.getElementById('compare-count').textContent = __("selected_count").replace('{count}', checks.length);
+}
+
+function doCompareFromTab() {
+    const checks = document.querySelectorAll('.hist-check-2:checked');
+    if (checks.length < 2) return;
+    const ids = Array.from(checks).map(c => c.value).join(',');
+    fetchCompare(ids);
+}
+
+/* ===== FETCH & RENDER COMPARE ===== */
+function fetchCompare(ids) {
+    const loading = document.getElementById('compare-loading');
+    const error = document.getElementById('compare-error');
+    const content = document.getElementById('compare-content');
+    loading.style.display = 'block';
+    error.style.display = 'none';
+    content.style.display = 'none';
+
+    fetch('/api/compare', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+        body: `entry_ids=${encodeURIComponent(ids)}`
+    })
+    .then(r => r.json())
+    .then(data => {
+        loading.style.display = 'none';
+        if (data.error) { error.textContent = data.error; error.style.display = 'block'; return; }
+        renderCompare(data.entries);
+        content.style.display = 'block';
+    })
+    .catch(err => {
+        console.log("Debug: /api/compare error:", err.message);
+        loading.style.display = 'none';
+        error.textContent = __("network_error") + err.message;
+        error.style.display = 'block';
+    });
+}
+
+function renderCompare(entries) {
+    const container = document.getElementById('compare-content');
+    const colors = ['#06b6d4','#f59e0b','#10b981','#f43f5e','#6366f1','#a855f7'];
+
+    const metrics = [
+        { key: 'length', label: __("length_da"), unit: 'aa', better: null },
+        { key: 'weight', label: __("weight_da"), unit: 'Da', better: null },
+        { key: 'pi', label: __("iso_point"), unit: '', better: null },
+        { key: 'gravy', label: 'GRAVY', unit: '', better: null },
+        { key: 'aromaticity', label: __("aromaticity_pct"), unit: '%', better: 'higher' },
+        { key: 'instability', label: __("instability_index"), unit: '', better: 'lower' },
+    ];
+
+    let html = '<div style="overflow-x:auto;">';
+    html += '<table class="comp-table"><thead><tr><th>' + __("metric") + '</th>';
+    for (let i = 0; i < entries.length; i++) {
+        html += `<th style="color:${colors[i % colors.length]};">${entries[i].pdb_id}</th>`;
+    }
+    if (entries.length === 2) html += '<th style="color:var(--accent-amber);">' + __("difference_delta") + '</th>';
+    html += '</tr></thead><tbody>';
+
+    for (const m of metrics) {
+        const vals = entries.map(e => parseFloat(e[m.key]));
+        html += `<tr><td class="row-label">${m.label}</td>`;
+        for (let i = 0; i < entries.length; i++) {
+            html += `<td>${vals[i].toFixed(2)}</td>`;
+        }
+        if (entries.length === 2) {
+            const diff = vals[1] - vals[0];
+            let cls = 'delta-neu';
+            let sign = diff >= 0 ? '+' : '';
+            if (m.better === 'lower') cls = diff < 0 ? 'delta-pos' : diff > 0 ? 'delta-neg' : 'delta-neu';
+            else if (m.better === 'higher') cls = diff > 0 ? 'delta-pos' : diff < 0 ? 'delta-neg' : 'delta-neu';
+            html += `<td class="${cls}">${sign}${diff.toFixed(2)} ${m.unit}</td>`;
+        }
+        html += '</tr>';
+    }
+
+    // Stability as categorical
+    html += `<tr><td class="row-label">${__("stability")}</td>`;
+    for (const e of entries) {
+        const isStable = e.is_stable;
+        html += `<td class="${isStable ? 'delta-pos' : 'delta-neg'}">${isStable ? 'STABLE' : 'UNSTABLE'}</td>`;
+    }
+    if (entries.length === 2) {
+        const s0 = entries[0].is_stable, s1 = entries[1].is_stable;
+        let cls = 'delta-neu', txt = '—';
+        if (s0 === s1) { cls = 'delta-neu'; txt = __("identical"); }
+        else if (s1) { cls = 'delta-pos'; txt = __("improved"); }
+        else { cls = 'delta-neg'; txt = __("worsened"); }
+        html += `<td class="${cls}">${txt}</td>`;
+    }
+    html += '</tr></tbody></table></div>';
+
+    // Bar charts for key metrics
+    for (const m of metrics) {
+        if (m.key === 'pi' || m.key === 'gravy') continue;
+        const vals = entries.map(e => parseFloat(e[m.key]));
+        const minV = Math.min(...vals), maxV = Math.max(...vals);
+        const range = Math.max(maxV - minV, 1);
+
+        html += `<h4 style="color:${colors[0]};margin-top:24px;margin-bottom:10px;font-size:14px;">${m.label}</h4>`;
+        for (let i = 0; i < entries.length; i++) {
+            const pct = ((vals[i] - minV) / range) * 70 + 5;
+            const c = colors[i % colors.length];
+            html += `<div class="comp-bar-row">
+                <span class="comp-pdb-tag">${entries[i].pdb_id}</span>
+                <div class="comp-bar-track"><div class="comp-bar-fill" style="width:${pct}%;background:${c};"></div></div>
+                <span class="comp-bar-val" style="color:${c};">${vals[i].toFixed(2)}</span>
+            </div>`;
+        }
+    }
+
+    html += `<div style="margin-top:24px;padding:16px;background:#0b0f19;border-radius:10px;border:1px solid var(--border-color);font-size:12px;color:var(--text-muted);">
+        <span style="color:var(--accent-emerald);">${__("legend_green")}</span> ${__("legend_favorable")} &nbsp;|&nbsp;
+        <span style="color:var(--accent-rose);">${__("legend_pink")}</span> ${__("legend_unfavorable")} &nbsp;|&nbsp;
+        ${__("legend_lower_better")}
+    </div>`;
+
+    container.innerHTML = html;
+}
+
+/* ===== 3D CAPTURE ===== */
+function capture3DView(pdbId) {
+    const container = document.getElementById('molstar-container');
+    if (!container) return;
+    const viewer = container.querySelector('pdbe-molstar');
+    if (!viewer) return;
+    let canvas = null;
+    if (viewer.shadowRoot) canvas = viewer.shadowRoot.querySelector('canvas');
+    if (!canvas) canvas = viewer.querySelector('canvas');
+    if (!canvas) canvas = container.querySelector('canvas');
+    if (!canvas) { alert(__("3d_canvas_not_found")); return; }
+    try {
+        const w = canvas.width, h = canvas.height;
+        if (!w || !h) { alert(__("3d_not_loaded")); return; }
+        const srcCanvas = document.createElement('canvas');
+        srcCanvas.width = w; srcCanvas.height = h;
+        const srcCtx = srcCanvas.getContext('2d');
+        srcCtx.drawImage(canvas, 0, 0);
+        const bgCanvas = document.createElement('canvas');
+        bgCanvas.width = w; bgCanvas.height = h;
+        const bgCtx = bgCanvas.getContext('2d');
+        const imageData = srcCtx.getImageData(0, 0, w, h);
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            if (data[i] < 15 && data[i+1] < 15 && data[i+2] < 15) data[i+3] = 0;
+        }
+        bgCtx.putImageData(imageData, 0, 0);
+        const link = document.createElement('a');
+        link.download = (pdbId || 'protein').toLowerCase() + '_3d.png';
+        link.href = bgCanvas.toDataURL('image/png');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch(e) { alert(__("error_prefix") + e.message); }
+}
+
+/* ===== MUTATION SIMULATOR ===== */
+(function() {
+    const sequence = '{{ sequence|e }}';
+    const btn = document.getElementById('mut-btn');
+    const resultsDiv = document.getElementById('mut-results');
+    const origDiv = document.getElementById('mut-orig');
+    const mutantDiv = document.getElementById('mut-mutant');
+    const mutLabel = document.getElementById('mut-label');
+    if (!btn || !sequence) return;
+
+    function fmtDelta(valA, valB, label, unit, higherBetter) {
+        const a = parseFloat(valA), b = parseFloat(valB);
+        if (isNaN(a) || isNaN(b)) return '';
+        const diff = b - a;
+        const sign = diff >= 0 ? '+' : '';
+        const arrow = higherBetter !== undefined
+            ? (diff > 0 ? (higherBetter ? '▲' : '▼') : diff < 0 ? (higherBetter ? '▼' : '▲') : '') : '';
+        const cls = diff > 0 ? 'var(--accent-emerald)' : diff < 0 ? 'var(--accent-rose)' : 'var(--text-muted)';
+        return `<div style="display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid #1e293b;">
+            <span style="color:var(--text-muted)">${label}</span>
+            <span><strong style="color:#f1f5f9">${a}</strong> → <strong style="color:#f1f5f9">${b}</strong>
+            <span style="color:${cls};margin-left:6px;font-size:11px;">${arrow} ${sign}${diff.toFixed(2)} ${unit}</span></span>
+        </div>`;
+    }
+
+    btn.addEventListener('click', function() {
+        const pos = document.getElementById('mut-pos').value;
+        const aa = document.getElementById('mut-aa').value;
+        btn.textContent = __("processing");
+        btn.classList.add('mut-btn-loading');
+        fetch('/api/mutate', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `sequence=${encodeURIComponent(sequence)}&position=${pos}&new_aa=${aa}`
+        })
+        .then(r => r.json())
+        .then(data => {
+            btn.textContent = __("run_mutation_button");
+            btn.classList.remove('mut-btn-loading');
+            if (data.error) { alert(data.error); return; }
+            const o = data.original, m = data.mutant;
+            mutLabel.textContent = __("mutant_label").replace('{aa}', data.mutant_aa);
+            origDiv.innerHTML =
+                fmtDelta(o.weight, o.weight, __("molecular_weight"), 'Da') +
+                fmtDelta(o.pi, o.pi, __("iso_point"), '') +
+                fmtDelta(o.gravy, o.gravy, 'GRAVY', '') +
+                fmtDelta(o.aromaticity, o.aromaticity, __("aromaticity"), '%') +
+                fmtDelta(o.instability, o.instability, __("instability_index"), '', false) +
+                `<div style="margin-top:6px;text-align:center;"><span class="badge ${o.is_stable ? 'badge-stable' : 'badge-unstable'}">${o.is_stable ? 'STABLE' : 'UNSTABLE'}</span></div>`;
+            mutantDiv.innerHTML =
+                fmtDelta(o.weight, m.weight, __("molecular_weight"), 'Da') +
+                fmtDelta(o.pi, m.pi, __("iso_point"), '') +
+                fmtDelta(o.gravy, m.gravy, 'GRAVY', '') +
+                fmtDelta(o.aromaticity, m.aromaticity, __("aromaticity"), '%') +
+                fmtDelta(o.instability, m.instability, __("instability_index"), '', false) +
+                `<div style="margin-top:6px;text-align:center;"><span class="badge ${m.is_stable ? 'badge-stable' : 'badge-unstable'}">${m.is_stable ? 'STABLE' : 'UNSTABLE'}</span></div>`;
+            resultsDiv.style.display = 'block';
+    })
+    .catch(err => {
+        console.log("Debug: /api/mutate error:", err.message);
+        btn.textContent = __("run_mutation_button");
+        btn.classList.remove('mut-btn-loading');
+        alert(__("network_error") + ' ' + err.message);
+    });
+    });
+})();
+
+/* ===== NOTES SAVE ===== */
+(function() {
+    const saveBtn = document.getElementById('notes-save-btn');
+    const notesArea = document.getElementById('lab-notes');
+    const entryIdInput = document.getElementById('notes-entry-id');
+    const statusSpan = document.getElementById('notes-status');
+    if (!saveBtn || !notesArea || !entryIdInput) return;
+    saveBtn.addEventListener('click', function() {
+        const entryId = entryIdInput.value;
+        const notes = notesArea.value;
+        if (!entryId) {
+            statusSpan.textContent = __("no_loaded_entry");
+            statusSpan.style.display = 'inline'; statusSpan.style.color = 'var(--accent-rose)';
+            setTimeout(() => { statusSpan.style.display = 'none'; }, 3000);
+            return;
+        }
+        saveBtn.textContent = __("processing");
+        saveBtn.disabled = true;
+        fetch('/api/save_notes', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: `entry_id=${encodeURIComponent(entryId)}&notes=${encodeURIComponent(notes)}`
+        })
+        .then(r => r.json())
+        .then(data => {
+            saveBtn.textContent = __("save_notes_button");
+            saveBtn.disabled = false;
+            if (data.ok) {
+                statusSpan.textContent = __("saved");
+                statusSpan.style.display = 'inline'; statusSpan.style.color = 'var(--accent-emerald)';
+                setTimeout(() => { statusSpan.style.display = 'none'; }, 3000);
+            } else {
+                statusSpan.textContent = '✗ ' + (data.error || '');
+                statusSpan.style.display = 'inline'; statusSpan.style.color = 'var(--accent-rose)';
+            }
+        })
+        .catch(err => {
+            console.log("Debug: /api/save_notes error:", err.message);
+            saveBtn.textContent = __("save_notes_button");
+            saveBtn.disabled = false;
+            statusSpan.textContent = __("notes_status_network_error");
+            statusSpan.style.display = 'inline'; statusSpan.style.color = 'var(--accent-rose)';
+        });
+    });
+})();
+
+/* ===== PDB AUTOCOMPLETE ===== */
+(function() {
+    const input = document.getElementById('pdb-input');
+    const suggestions = document.getElementById('pdb-suggestions');
+    if (!input || !suggestions) return;
+
+    let debounceTimer = null;
+    let currentFocus = -1;
+    let currentResults = [];
+
+    function hideSuggestions() {
+        suggestions.classList.remove('show');
+        suggestions.innerHTML = '';
+        currentFocus = -1;
+        currentResults = [];
+    }
+
+    function selectSuggestion(id) {
+        input.value = id;
+        hideSuggestions();
+        input.focus();
+        // Trigger input event in case any listeners need it
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function renderSuggestions(results) {
+        suggestions.innerHTML = '';
+        currentResults = results;
+        currentFocus = -1;
+
+        if (results.length === 0) {
+            suggestions.innerHTML = '<div class="pdb-no-results">' + __("no_results") + '</div>';
+            suggestions.classList.add('show');
+            return;
+        }
+
+        for (let i = 0; i < results.length; i++) {
+            const item = results[i];
+            const div = document.createElement('div');
+            div.className = 'pdb-suggestion';
+            div.dataset.index = i;
+
+            const pidSpan = document.createElement('span');
+            pidSpan.className = 'pid';
+            pidSpan.textContent = item.id;
+
+            const titleSpan = document.createElement('span');
+            titleSpan.className = 'ptitle';
+            titleSpan.textContent = item.title || __("no_title");
+
+            const badge = document.createElement('span');
+            badge.className = 'pdb-badge';
+            badge.textContent = __("pdb_badge");
+
+            div.appendChild(pidSpan);
+            div.appendChild(titleSpan);
+            div.appendChild(badge);
+
+            div.addEventListener('click', function() {
+                selectSuggestion(item.id);
+            });
+
+            div.addEventListener('mouseenter', function() {
+                document.querySelectorAll('.pdb-suggestion').forEach(el => el.classList.remove('active'));
+                this.classList.add('active');
+                currentFocus = parseInt(this.dataset.index);
+            });
+
+            suggestions.appendChild(div);
+        }
+        suggestions.classList.add('show');
+    }
+
+    function fetchSuggestions(query) {
+        fetch('/api/autocomplete?q=' + encodeURIComponent(query) + '&limit=10')
+            .then(r => r.json())
+            .then(data => {
+                if (Array.isArray(data)) {
+                    renderSuggestions(data);
+                }
+            })
+            .catch(err => { console.log("Debug: /api/autocomplete error:", err.message); });
+    }
+
+    input.addEventListener('input', function() {
+        const val = this.value.trim();
+        if (val.length < 2) {
+            hideSuggestions();
+            return;
+        }
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(function() {
+            fetchSuggestions(val);
+        }, 350);
+    });
+
+    input.addEventListener('keydown', function(e) {
+        const items = suggestions.querySelectorAll('.pdb-suggestion');
+        if (items.length === 0) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            currentFocus = Math.min(currentFocus + 1, items.length - 1);
+            items.forEach((el, idx) => el.classList.toggle('active', idx === currentFocus));
+            if (currentFocus >= 0 && currentResults[currentFocus]) {
+                input.value = currentResults[currentFocus].id;
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            currentFocus = Math.max(currentFocus - 1, -1);
+            items.forEach((el, idx) => el.classList.toggle('active', idx === currentFocus));
+            if (currentFocus >= 0 && currentResults[currentFocus]) {
+                input.value = currentResults[currentFocus].id;
+            } else {
+                input.value = input.getAttribute('data-last-value') || input.value;
+            }
+        } else if (e.key === 'Enter' || e.key === 'Tab') {
+            if (currentFocus >= 0 && currentResults[currentFocus]) {
+                e.preventDefault();
+                selectSuggestion(currentResults[currentFocus].id);
+            } else {
+                hideSuggestions();
+            }
+        } else if (e.key === 'Escape') {
+            hideSuggestions();
+        }
+    });
+
+    input.addEventListener('blur', function() {
+        setTimeout(hideSuggestions, 150);
+    });
+
+    input.addEventListener('focus', function() {
+        if (this.value.trim().length >= 2 && currentResults.length > 0) {
+            suggestions.classList.add('show');
+        }
+    });
+
+    // Store the last typed value for arrow-up restoration
+    input.addEventListener('input', function() {
+        if (this.value.trim().length >= 2) {
+            input.setAttribute('data-last-value', this.value);
+        }
+    });
+})();
+
+/* ===== INIT: update compare checkbox state ===== */
+toggleCompare();
+toggleCompare2();
+</script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="{{ html_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ _('prism_short_title', mode=(_('login_title') if mode == 'login' else _('register_title'))) }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #060913;
+            color: #f1f5f9;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        .auth-card {
+            background-color: #0f1424;
+            border: 1px solid #222f54;
+            border-radius: 20px;
+            padding: 45px 40px;
+            width: 100%;
+            max-width: 420px;
+            box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
+        }
+        .lang-switch {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .lang-switch a {
+            color: #64748b;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            transition: all 0.15s;
+        }
+        .lang-switch a:hover { color: #06b6d4; background: #06b6d410; }
+        .lang-switch a.active { color: #06b6d4; background: #06b6d420; }
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(to right, #06b6d4, #6366f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #64748b;
+            font-size: 13px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            background-color: #171e36;
+            border: 1px solid #222f54;
+            border-radius: 12px;
+            color: #f1f5f9;
+            font-size: 15px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: #6366f1; }
+        .field { margin-bottom: 20px; }
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #6366f1, #06b6d4);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
+        .btn:hover { opacity: 0.9; }
+        .error {
+            background-color: #88133720;
+            border: 1px solid #f43f5e;
+            color: #f43f5e;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .footer-link {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        .footer-link a {
+            color: #06b6d4;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .footer-link a:hover { text-decoration: underline; }
+        .flash-msg {
+            background-color: #065f4620;
+            border: 1px solid #10b981;
+            color: #10b981;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-card">
+        <div class="lang-switch">
+            <a href="{{ url_for('main.set_lang', lang='en') }}" class="{% if current_lang == 'en' %}active{% endif %}">EN</a>
+            <span style="color:#222f54;margin:0 4px;">|</span>
+            <a href="{{ url_for('main.set_lang', lang='hu') }}" class="{% if current_lang == 'hu' %}active{% endif %}">HU</a>
+        </div>
+        <div class="logo">PRISM</div>
+        <div class="subtitle">{{ _('protein_intelligence_suite') }}</div>
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-msg">{{ message }}</div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% if mode == 'login' %}
+        <form method="POST" action="/login">
+            <div class="field">
+                <label>{{ _('username') }}</label>
+                <input type="text" name="username" required placeholder="{{ _('username_placeholder') }}">
+            </div>
+            <div class="field">
+                <label>{{ _('password') }}</label>
+                <input type="password" name="password" required placeholder="{{ _('password_placeholder') }}">
+            </div>
+            <button class="btn" type="submit">{{ _('login_title') }}</button>
+        </form>
+        <div class="footer-link">
+            {{ _('no_account') }} <a href="/register">{{ _('register_link') }}</a>
+        </div>
+        {% else %}
+        <form method="POST" action="/register">
+            <div class="field">
+                <label>{{ _('username') }}</label>
+                <input type="text" name="username" required placeholder="{{ _('username_placeholder') }}" minlength="3">
+            </div>
+            <div class="field">
+                <label>{{ _('password') }}</label>
+                <input type="password" name="password" required placeholder="{{ _('password_placeholder') }}" minlength="6">
+            </div>
+            <button class="btn" type="submit">{{ _('register_title') }}</button>
+        </form>
+        <div class="footer-link">
+            {{ _('have_account') }} <a href="/login">{{ _('login_link') }}</a>
+        </div>
+        {% endif %}
+    </div>
+</body>
+</html>

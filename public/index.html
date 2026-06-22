@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRISM&trade; Protein Intelligence Suite</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #060913; color: #f1f5f9; line-height: 1.6;
+        }
+        .container { max-width: 840px; margin: 0 auto; padding: 40px 24px; }
+
+        /* HERO */
+        .hero { text-align: center; padding: 80px 0 40px; }
+        .hero h1 {
+            font-size: 44px; font-weight: 800; margin-bottom: 12px;
+            background: linear-gradient(to right, #06b6d4, #6366f1, #a855f7);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p { font-size: 17px; color: #94a3b8; max-width: 640px; margin: 0 auto 32px; }
+        .btn {
+            display: inline-block; padding: 16px 40px; border-radius: 12px;
+            font-size: 17px; font-weight: 700; text-decoration: none;
+            background: linear-gradient(135deg, #6366f1, #06b6d4); color: white;
+            box-shadow: 0 4px 24px rgba(99,102,241,0.35);
+            transition: opacity 0.15s;
+        }
+        .btn:hover { opacity: 0.9; }
+        .badge-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 24px 0; }
+        .badge {
+            padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+            border: 1px solid #222f54; background: #0f1424; color: #94a3b8;
+        }
+        .badge.accent { border-color: #06b6d450; color: #06b6d4; }
+
+        /* METHODOLOGY */
+        .methodology {
+            background: #0f1424; border: 1px solid #222f54; border-radius: 16px;
+            padding: 40px; margin: 40px 0;
+        }
+        .methodology h2 {
+            font-size: 20px; font-weight: 700; margin-bottom: 20px;
+            color: #06b6d4; border-left: 3px solid #6366f1; padding-left: 12px;
+        }
+        .methodology p { font-size: 15px; color: #cbd5e1; margin-bottom: 16px; }
+        .methodology p:last-child { margin-bottom: 0; }
+
+        /* FORM */
+        .form-card {
+            background: #0f1424; border: 1px solid #222f54; border-radius: 16px;
+            padding: 40px; text-align: center; margin: 40px 0;
+        }
+        .form-card h2 { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+        .form-card .sub { color: #94a3b8; font-size: 14px; margin-bottom: 24px; }
+        .form-card input {
+            width: 100%; max-width: 420px; padding: 14px 18px; border-radius: 10px;
+            border: 1px solid #222f54; background: #060913; color: #f1f5f9;
+            font-size: 15px; margin-bottom: 14px; display: block; margin-left: auto; margin-right: auto;
+        }
+        .form-card input:focus { outline: none; border-color: #6366f1; }
+        .form-card button {
+            display: block; margin: 0 auto; padding: 14px 40px; border-radius: 10px;
+            border: none; font-size: 15px; font-weight: 700; cursor: pointer;
+            background: linear-gradient(135deg, #6366f1, #06b6d4); color: white;
+            box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+        }
+        .form-card button:hover { opacity: 0.9; }
+        .form-card .note { font-size: 12px; color: #475569; margin-top: 16px; }
+
+        /* FOOTER */
+        footer { text-align: center; padding: 40px 0; color: #475569; font-size: 13px; }
+        footer a { color: #64748b; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HERO -->
+        <div class="hero">
+            <h1>PRISM&trade; Protein Intelligence Suite</h1>
+            <p>From raw sequence to druggability analysis in under 2 seconds. No scripts. No pipeline assembly.</p>
+            <a class="btn" href="http://localhost:5000/app" target="_blank">Try Demo Now &rarr;</a>
+            <div class="badge-row">
+                <span class="badge accent">BioPython</span>
+                <span class="badge">Mol* 3D</span>
+                <span class="badge">RCSB PDB</span>
+                <span class="badge">PDF/CSV Export</span>
+                <span class="badge">RUO</span>
+            </div>
+        </div>
+
+        <!-- METHODOLOGY -->
+        <div class="methodology">
+            <h2>Methodology Summary</h2>
+
+            <p>PRISM computes a comprehensive panel of physicochemical descriptors from a user-provided amino acid sequence using the BioPython <em>ProtParam</em> library (Cock et al., 2009). Input sequences are filtered to the 20 standard amino acids; sequences shorter than two residues are rejected. The following parameters are calculated: molecular weight (in daltons), isoelectric point (pI) via the method of Bjellqvist et al. (1993), grand average of hydropathicity (GRAVY; Kyte &amp; Doolittle, 1982), aromaticity index (Lobry, 1997), and the instability index (Guruprasad et al., 1990).</p>
+
+            <p>Secondary structure fractions (&alpha;-helix, &beta;-sheet, and loop/turn) are predicted from amino-acid propensities (Deleage &amp; Roux, 1987). Molar extinction coefficients at 280 nm are calculated for both reduced and oxidised (disulfide-bonded) states using the Gill &amp; von Hippel (1989) method. Amino-acid residue distributions are reported across five physicochemical groups (hydrophobic, positively charged, negatively charged, polar uncharged, and special/structural).</p>
+
+            <p>All computed values are interpreted through a rule-based drug-target strategy framework: GRAVY thresholds classify proteins as hydrophobic transmembrane, amphipathic, or hydrophilic; pI ranges determine electrostatic complementarity (acidic, neutral, or basic); and the instability index distinguishes stable (index &lt; 40) from conformationally flexible targets. The complete analysis executes in under two seconds for a typical 300-residue sequence.</p>
+        </div>
+
+        <!-- FORM -->
+        <div class="form-card" id="access">
+            <h2>Request Academic Access</h2>
+            <p class="sub">Qualified academic labs receive a complimentary 6-month license (unlimited analyses, full export).</p>
+            <form action="https://formspree.io/f/your-form-id" method="POST">
+                <input type="email" name="email" placeholder="Your institutional e-mail" required>
+                <input type="text" name="institution" placeholder="Institution / Lab name">
+                <input type="hidden" name="_subject" value="PRISM Academic Access Request">
+                <button type="submit">Request Access</button>
+            </form>
+            <p class="note">Research Use Only. No warranty. Use at your own risk.</p>
+        </div>
+
+        <!-- FOOTER -->
+        <footer>
+            <p>PRISM&trade; Protein Intelligence Suite &mdash; Enterprise Molecular Diagnostics &amp; Bioinformatics SaaS Platform</p>
+            <p style="margin-top:6px;"><a href="mailto:contact@prism-protein.com">contact@prism-protein.com</a> &middot; Research Use Only &middot; Use at your own risk</p>
+        </footer>
+    </div>
+</body>
+</html>
