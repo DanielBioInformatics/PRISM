@@ -4,9 +4,10 @@ import string
 import itertools
 import urllib.request
 import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from flask import Blueprint, request, jsonify, session
 from db import get_db, get_user_id, get_versions
-from bio_engine import advanced_biophysical_analysis
+from bio_engine import run_analysis
 from config import Config
 from i18n import i18n
 
@@ -80,13 +81,16 @@ def _fetch_missing_by_prefix(prefix):
             pass
         return local_found
 
-    for i in range(0, len(all_possible), batch_size):
-        batch = all_possible[i:i+batch_size]
-        try:
-            found = check_batch(batch)
-            new_ids.extend(found)
-        except Exception:
-            pass
+    batches = [all_possible[i:i+batch_size] for i in range(0, len(all_possible), batch_size)]
+
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = {executor.submit(check_batch, batch): batch for batch in batches}
+        for future in as_completed(futures):
+            try:
+                found = future.result()
+                new_ids.extend(found)
+            except Exception:
+                pass
 
     return new_ids
 
@@ -234,8 +238,8 @@ def mutate():
     original_aa = clean_seq[position - 1]
     mutated = clean_seq[:position - 1] + new_aa + clean_seq[position:]
 
-    original_results = advanced_biophysical_analysis(clean_seq)
-    mutant_results = advanced_biophysical_analysis(mutated)
+    original_results = run_analysis(clean_seq)
+    mutant_results = run_analysis(mutated)
 
     if "error" in original_results:
         return jsonify({"error": original_results["error"]}), 400
@@ -275,7 +279,7 @@ def compare():
     entries = []
     for row in rows:
         entry_id, pdb_id, seq, ts = row
-        analysis = advanced_biophysical_analysis(seq)
+        analysis = run_analysis(seq, pdb_id=pdb_id or "")
         if "error" not in analysis:
             analysis['entry_id'] = entry_id
             analysis['pdb_id'] = pdb_id.upper() if pdb_id else i18n.translate("na")

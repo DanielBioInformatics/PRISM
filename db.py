@@ -35,7 +35,7 @@ def init_db():
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     ''')
-    for col in ('sequence', 'user_id', 'notes', 'version_group', 'version_num INTEGER DEFAULT 1'):
+    for col in ('sequence', 'user_id', 'notes', 'version_group', 'version_num INTEGER DEFAULT 1', 'results_json TEXT'):
         try:
             c.execute(f'ALTER TABLE protein_history ADD COLUMN {col}')
         except sqlite3.OperationalError:

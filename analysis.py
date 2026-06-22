@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, send_file, session, redirect, url_for
 from fpdf import FPDF
 from db import get_user_id, get_history, get_versions, get_all_notes, save_entry, load_entry
-from bio_engine import advanced_biophysical_analysis
+from bio_engine import run_analysis
 from i18n import i18n
 
 analysis_bp = Blueprint('analysis', __name__)
@@ -34,13 +34,13 @@ def index():
             pdb_id = row[1] if row[1] != "N/A" else ""
             notes = row[2] or ""
             entry_id = int(load_id)
-            results = advanced_biophysical_analysis(seq)
+            results = run_analysis(seq, pdb_id=pdb_id)
 
     if request.method == "POST":
         seq = request.form.get("sequence", "")
         pdb_id = request.form.get("pdb_id", "").strip().lower()
         if seq:
-            results = advanced_biophysical_analysis(seq)
+            results = run_analysis(seq, pdb_id=pdb_id)
 
         if results and "error" not in results:
             try:
@@ -87,7 +87,7 @@ def download_pdf():
     notes = request.form.get("notes", "")
     if not seq:
         return i18n.translate("missing_sequence"), 400
-    results = advanced_biophysical_analysis(seq)
+    results = run_analysis(seq, pdb_id=pdb_id)
     if "error" in results:
         return i18n.translate("analysis_error"), 400
 
@@ -247,11 +247,12 @@ def download_csv():
     pdb_id = request.form.get("pdb_id", "").strip().lower()
     if not seq:
         return i18n.translate("missing_sequence"), 400
-    results = advanced_biophysical_analysis(seq)
+    results = run_analysis(seq, pdb_id=pdb_id)
     if "error" in results:
         return i18n.translate("analysis_error"), 400
 
     pdb_label = pdb_id.upper() if pdb_id else i18n.translate("na")
+
     buf = StringIO()
     w = csv.writer(buf)
 

@@ -1,7 +1,9 @@
 from Bio.SeqUtils.ProtParam import ProteinAnalysis
+from cache import cached_analysis
 
 
-def advanced_biophysical_analysis(sequence):
+@cached_analysis()
+def run_analysis(sequence, pdb_id=""):
     standard_aa = set("ACDEFGHIKLMNPQRSTVWY")
     clean_seq = "".join(c for c in sequence.upper() if c in standard_aa)
     if len(clean_seq) < 2:
